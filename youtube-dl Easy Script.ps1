@@ -49,7 +49,9 @@ param (
 # Set ffmpeg location here. Make sure it is up to date (if using chocolatey:  chocolatey upgrade ffmpeg )
 # Set output location and filename of downloaded files. Defaults to Desktop, with video title and video extension. See documentation on specifics.
 # Set default options / parameters to apply to all downloads. See youtube-dl documentation for details. Includes ffmpeg location and output location using the other variables.
-$ffmpeg_location="`"ffmpeg.exe`"" # Just put it in the same directory as the script
+$scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$ffmpegPath = Join-Path $scriptRoot "ffmpeg.exe"
+$ffmpeg_location = "`"$ffmpegPath`"" # Using full path to ffmpeg.exe
 $output_location="`"Outputs\%(title)s.%(ext)s`"" # Outputs to a folder called "Outputs" in the same directory as the script, with filename as video title
 $downloader_exe="yt-dlp.exe" # "yt-dlp.exe"  or  "youtube-dl.exe"
 $other_options = "--no-mtime --add-metadata"  # The variables for ffmpeg location and output location are added automatically later
@@ -119,7 +121,7 @@ function Set-Format {
 # Outputs preview of format for user approval
 function Check-Format {
 	Write-Host "Output will be: " 
-	Write-Host (& .\$downloader_exe $format $URL --get-format)
+	Write-Host (& $downloader_exe $format $URL --get-format)
 	Read-Host "Ok? (Enter Y/N)"
 }
 
@@ -146,7 +148,7 @@ function Custom-Formats {
 
 # Updates youtube-dl (must be in same directory as script)
 function Update-Program{
-	& .\$downloader_exe --update
+	& $downloader_exe --update
 	exit
 	}
 
@@ -217,12 +219,12 @@ if (Is-PlaylistUrl $URL) {
         $isPlaylist = "false"
         $URL = Remove-PlaylistFromUrl $URL
         Write-Output "Will download video..."
-		& .\$downloader_exe --list-formats $URL
+		& $downloader_exe --list-formats $URL
     }
 } else {
     $isPlaylist = "false"
     Write-Output ""
-    & .\$downloader_exe --list-formats $URL
+    & $downloader_exe --list-formats $URL
 }
 
 while ($confirm -ne "y") {
@@ -253,6 +255,6 @@ while ($confirm -ne "y") {
 
 # Final Run
 Write-Output ""
-Write-Output "Running Command:   .\$downloader_exe $format $URL '--%' $options"
-& .\$downloader_exe $format $URL '--%' $options #Final full command used on youtube-dl. The '--%' basically tells powershell not to interpret the rest of the line as powershell commands, so it can be passed to youtube-dl as is.
+Write-Output "Running Command:   & $downloader_exe $format $URL '--%' $options"
+& $downloader_exe $format $URL '--%' $options
 cmd /c pause
