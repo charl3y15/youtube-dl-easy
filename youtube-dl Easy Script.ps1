@@ -72,13 +72,20 @@ if (-not $exe) {
 
 if ($desktop) {
     $output_location = "`"$HOME\Desktop\Outputs\%(title)s.%(ext)s`""
+} else {
+    $outputDir = Join-Path $scriptRoot "Outputs"
+    if (-not (Test-Path $outputDir)) {
+        New-Item -ItemType Directory -Path $outputDir | Out-Null
+    }
+    $output_location = "`"$outputDir\%(title)s.%(ext)s`""
 }
 
 if ($options) {
     $other_options = $options
 }
 
-$options = "$other_options --ffmpeg-location $ffmpeg_location --output $output_location"
+# Ensure proper path escaping for ffmpeg and output
+$options = "$other_options --ffmpeg-location $ffmpeg_location --output $output_location --no-part"
 
 if ($debug) {
     Write-Output "`nDebug Information:"
