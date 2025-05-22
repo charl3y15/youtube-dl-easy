@@ -51,7 +51,7 @@ param (
 # Set default options / parameters to apply to all downloads. See youtube-dl documentation for details. Includes ffmpeg location and output location using the other variables.
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $ffmpegPath = Join-Path $scriptRoot "ffmpeg.exe"
-$ffmpeg_location = "`"$ffmpegPath`"" # Using full path to ffmpeg.exe
+$ffmpeg_location = $ffmpegPath.Replace('\', '/') # Convert backslashes to forward slashes
 $output_location="`"Outputs\%(title)s.%(ext)s`"" # Outputs to a folder called "Outputs" in the same directory as the script, with filename as video title
 $downloader_exe="yt-dlp.exe" # "yt-dlp.exe"  or  "youtube-dl.exe"
 $other_options = "--no-mtime --add-metadata"  # The variables for ffmpeg location and output location are added automatically later
@@ -85,13 +85,14 @@ if ($options) {
 }
 
 # Ensure proper path escaping for ffmpeg and output
-$options = "$other_options --ffmpeg-location $ffmpeg_location --output $output_location --no-part"
+$options = "$other_options --ffmpeg-location `"$ffmpeg_location`" --output $output_location --no-part"
 
 if ($debug) {
     Write-Output "`nDebug Information:"
     Write-Output "=================="
     Write-Output "Downloader Executable: $downloader_exe"
     Write-Output "FFmpeg Location: $ffmpeg_location"
+    Write-Output "FFmpeg Path Exists: $(Test-Path $ffmpegPath)"
     Write-Output "Output Location: $output_location"
     Write-Output "Other Options: $other_options"
     Write-Output "Final Options string: $options"
