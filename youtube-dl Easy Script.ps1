@@ -58,16 +58,15 @@ $other_options = "--no-mtime --add-metadata"  # The variables for ffmpeg locatio
 
 # If exe parameter is not provided, look for yt-dlp.exe or youtube-dl.exe in the root folder
 if (-not $exe) {
-    $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
     $ytDlpPath = Join-Path $scriptRoot "yt-dlp.exe"
     $ytDlPath = Join-Path $scriptRoot "youtube-dl.exe"
     if (Test-Path $ytDlpPath) {
-        $downloader_exe = $ytDlpPath
+        $downloader_exe = $ytDlpPath.Replace('\', '/')
     } elseif (Test-Path $ytDlPath) {
-        $downloader_exe = $ytDlPath
+        $downloader_exe = $ytDlPath.Replace('\', '/')
     }
 } else {
-    $downloader_exe = $exe
+    $downloader_exe = $exe.Replace('\', '/')
 }
 
 if ($desktop) {
