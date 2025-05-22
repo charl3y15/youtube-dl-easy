@@ -54,7 +54,17 @@ $output_location="`"Outputs\%(title)s.%(ext)s`"" # Outputs to a folder called "O
 $downloader_exe="yt-dlp.exe" # "yt-dlp.exe"  or  "youtube-dl.exe"
 $other_options = "--no-mtime --add-metadata"  # The variables for ffmpeg location and output location are added automatically later
 
-if ($exe) {
+# If exe parameter is not provided, look for yt-dlp.exe or youtube-dl.exe in the root folder
+if (-not $exe) {
+    $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
+    $ytDlpPath = Join-Path $scriptRoot "yt-dlp.exe"
+    $ytDlPath = Join-Path $scriptRoot "youtube-dl.exe"
+    if (Test-Path $ytDlpPath) {
+        $downloader_exe = $ytDlpPath
+    } elseif (Test-Path $ytDlPath) {
+        $downloader_exe = $ytDlPath
+    }
+} else {
     $downloader_exe = $exe
 }
 
@@ -69,14 +79,14 @@ if ($options) {
 $options = "$other_options --ffmpeg-location $ffmpeg_location --output $output_location"
 
 if ($debug) {
-    Write-Host "`nDebug Information:"
-    Write-Host "=================="
-    Write-Host "Downloader Executable: $downloader_exe"
-    Write-Host "FFmpeg Location: $ffmpeg_location"
-    Write-Host "Output Location: $output_location"
-    Write-Host "Other Options: $other_options"
-    Write-Host "Final Options string: $options"
-    Write-Host "==================`n"
+    Write-Output "`nDebug Information:"
+    Write-Output "=================="
+    Write-Output "Downloader Executable: $downloader_exe"
+    Write-Output "FFmpeg Location: $ffmpeg_location"
+    Write-Output "Output Location: $output_location"
+    Write-Output "Other Options: $other_options"
+    Write-Output "Final Options string: $options"
+    Write-Output "==================`n"
 }
 
 
@@ -179,7 +189,16 @@ Write-Output ""
 Write-Output 'REQUIRES the youtube-dl program from: https://youtube-dl.org/'
 Write-Output 'Supported Video Sites: https://ytdl-org.github.io/youtube-dl/supportedsites.html'
 Write-Output ""
-$URL = Read-Host "Enter video URL here"
+
+# Prompt user for YouTube URL
+$URL = Read-Host "Enter the YouTube video URL you want to download"
+
+# Prompt user for save location
+$customOutput = Read-Host "Enter the full path where you want to save the downloaded file (or press Enter to use default: $output_location)"
+if ($customOutput -and $customOutput.Trim() -ne "") {
+    $output_location = "`"$customOutput`""
+    $options = "$other_options --ffmpeg-location $ffmpeg_location --output $output_location"
+}
 
 # Check if the URL is a regular playlist
 if (Is-PlaylistUrl $URL) {
