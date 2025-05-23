@@ -84,7 +84,7 @@ if ($options) {
 }
 
 # Ensure proper path escaping for ffmpeg and output
-$options = "$other_options --ffmpeg-location `"$ffmpeg_location`" --output $output_location --no-part"
+$options = "$other_options --ffmpeg-location `"$ffmpeg_location`" --output $output_location --no-part --force-overwrites"
 
 if ($debug) {
     Write-Output "`nDebug Information:"
