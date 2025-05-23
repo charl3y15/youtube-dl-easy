@@ -51,7 +51,7 @@ param (
 # Set default options / parameters to apply to all downloads. See youtube-dl documentation for details. Includes ffmpeg location and output location using the other variables.
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $ffmpegPath = Join-Path $scriptRoot "ffmpeg.exe"
-$ffmpeg_location = $ffmpegPath.Replace('\', '/') # Convert backslashes to forward slashes
+$ffmpeg_location = $ffmpegPath # Keep Windows-style backslashes
 $output_location="`"Outputs\%(title)s.%(ext)s`"" # Outputs to a folder called "Outputs" in the same directory as the script, with filename as video title
 $downloader_exe="yt-dlp.exe" # "yt-dlp.exe"  or  "youtube-dl.exe"
 $other_options = "--no-mtime --add-metadata"  # The variables for ffmpeg location and output location are added automatically later
@@ -61,12 +61,12 @@ if (-not $exe) {
     $ytDlpPath = Join-Path $scriptRoot "yt-dlp.exe"
     $ytDlPath = Join-Path $scriptRoot "youtube-dl.exe"
     if (Test-Path $ytDlpPath) {
-        $downloader_exe = $ytDlpPath.Replace('\', '/')
+        $downloader_exe = $ytDlpPath
     } elseif (Test-Path $ytDlPath) {
-        $downloader_exe = $ytDlPath.Replace('\', '/')
+        $downloader_exe = $ytDlPath
     }
 } else {
-    $downloader_exe = $exe.Replace('\', '/')
+    $downloader_exe = $exe
 }
 
 if ($desktop) {
