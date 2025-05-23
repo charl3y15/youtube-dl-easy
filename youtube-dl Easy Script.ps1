@@ -205,8 +205,21 @@ $URL = Read-Host "Enter the YouTube video URL you want to download"
 # Prompt user for save location
 $customOutput = Read-Host "Enter the full path where you want to save the downloaded file (or press Enter to use default: $output_location)"
 if ($customOutput -and $customOutput.Trim() -ne "") {
-    $output_location = "`"$customOutput`""
-    $options = "$other_options --ffmpeg-location $ffmpeg_location --output $output_location"
+    # Convert to proper Windows path format
+    $customOutput = $customOutput.TrimEnd('\').Replace('/', '\')
+    if (-not (Test-Path $customOutput)) {
+        try {
+            New-Item -ItemType Directory -Path $customOutput -Force | Out-Null
+        } catch {
+            Write-Output "Error creating directory: $_"
+            Write-Output "Using default output location instead."
+            $customOutput = $null
+        }
+    }
+    if ($customOutput) {
+        $output_location = "`"$customOutput\%(title)s.%(ext)s`""
+        $options = "$other_options --ffmpeg-location `"$ffmpeg_location`" --output $output_location --no-part"
+    }
 }
 
 # Check if the URL is a regular playlist
