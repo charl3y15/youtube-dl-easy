@@ -262,6 +262,7 @@ while ($confirm -ne "y") {
 
 # Final Run
 Write-Output ""
-Write-Output "Running Command:   & $downloader_exe $format $URL '--%' $options"
-& $downloader_exe $format $URL '--%' $options
+Write-Output "Running Command:   $downloader_exe $format $URL '--%' $options"
+# Execute the command using Start-Process to handle arguments properly
+Start-Process -FilePath $downloader_exe -ArgumentList "$format $URL '--%' $options" -NoNewWindow -Wait
 cmd /c pause
